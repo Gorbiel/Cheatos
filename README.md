@@ -1,6 +1,8 @@
 # Cheatos
 
-**Cheatos** is your terminal post-it notes manager — a lightweight CLI tool for storing cheat sheets ("cheatos") that you access, edit, and tag right from your shell.
+> Inspired by the need to stop forgetting one-liners for tools like `tar`, `ffmpeg`, or `git rebase`.
+
+**Cheatos** is a terminal post-it notes manager — lightweight CLI tool for storing cheat sheets called "cheatos", that you access, edit, and tag right from your shell.
 
 ---
 
@@ -21,7 +23,7 @@
 pipx install cheatos
 ```
 
-Make sure to have `pipx` and Python 3.7+ installed.
+Make sure to have `pipx` and Python 3.7+ installed. `pipx` is preferred over `pip` for global installations to avoid dependency conflicts and not breaking your OS' Python installation.
 
 ---
 
@@ -115,21 +117,7 @@ eval "$(register-python-argcomplete cheatos)"
 
 Add this to your `.bashrc` or `.zshrc`.
 
----
-
-## 📦 Packaging Info
-
-### Project metadata
-
-- Language: Python 3.7+
-- Installer: `pip`, `pipx`
-- Entry point: `cheatos = cheatos.cli:main`
-
----
-
-## 📄 License
-
-MIT © Gorbiel
+(I plan to add a command to re-prompt for autocompletion setup.)
 
 ---
 
@@ -141,4 +129,6 @@ MIT © Gorbiel
 
 ---
 
-> Inspired by the need to stop forgetting one-liners for tools like `tar`, `ffmpeg`, or `git rebase`.
+## 📄 License
+
+MIT © Gorbiel 2025
