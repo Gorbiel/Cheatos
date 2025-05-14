@@ -1,7 +1,10 @@
 import argparse
+import argcomplete
 import os
 import json
 import tempfile
+import subprocess
+# import shutil
 from pathlib import Path
 from appdirs import user_data_dir
 from datetime import datetime
@@ -13,6 +16,58 @@ CHEATO_DIR = Path(user_data_dir(APP_NAME, APP_AUTHOR))
 
 def ensure_cheato_dir():
     CHEATO_DIR.mkdir(parents=True, exist_ok=True)
+
+
+def cheato_name_completer(**kwargs):
+    return [f.stem for f in CHEATO_DIR.glob("*.json")]
+
+
+def tag_name_completer(**kwargs):
+    tags = set()
+    for path in CHEATO_DIR.glob("*.json"):
+        with open(path) as f:
+            data = json.load(f)
+            tags.update(data.get("tags", []))
+    return sorted(tags)
+
+
+def check_first_time():
+    marker_file = CHEATO_DIR / ".initialized"
+    if marker_file.exists():
+        return
+
+    print("👋 Welcome to Cheatos!")
+    print("To enable shell auto-completion, you can set it up now.")
+    choice = input("Would you like to enable it? [y/N]: ").strip().lower()
+
+    if choice == "y":
+        shell = os.environ.get("SHELL", "")
+        if "bash" in shell:
+            rc_file = Path.home() / ".bashrc"
+        elif "zsh" in shell:
+            rc_file = Path.home() / ".zshrc"
+        else:
+            print("❌ Unsupported shell for auto-setup.")
+            marker_file.touch()
+            return
+
+        try:
+            result = subprocess.run(
+                ["register-python-argcomplete", "cheatos"],
+                capture_output=True, text=True, check=True
+            )
+            completion_script = f"\n# Enable cheatos completion\n{result.stdout}\n"
+            with open(rc_file, "a") as f:
+                f.write(completion_script)
+            print(f"✅ Completion added to {rc_file}. Restart your shell or run: source {rc_file}")
+        except Exception as e:
+            print(f"⚠️ Could not set up completion: {e}")
+    else:
+        print("ℹ️ You can manually enable it later with:")
+        print('   eval "$(register-python-argcomplete cheatos)"')
+
+    marker_file.touch()
+    return
 
 
 def get_cheato_path(name):
@@ -160,6 +215,8 @@ def rename_cheato(old_name, new_name):
 
 def main():
     ensure_cheato_dir()
+    check_first_time()
+
     parser = argparse.ArgumentParser(description="Cheatos: Your terminal post-it notes manager")
     subparsers = parser.add_subparsers(
         dest="command",
@@ -170,11 +227,13 @@ def main():
 
     # cheatos list [--tag TAG] — list all cheatos or filter by tag
     list_parser = subparsers.add_parser("list", help="List all cheatos")
-    list_parser.add_argument("--tag", help="Filter by tag")
+    tag_arg = list_parser.add_argument("--tag", help="Filter by tag")
+    tag_arg.completer = tag_name_completer
 
     # cheatos show NAME — display a single cheato
     show_parser = subparsers.add_parser("show", help="Show a cheato")
-    show_parser.add_argument("name")
+    name_arg = show_parser.add_argument("name")
+    name_arg.completer = cheato_name_completer
 
     # cheatos add NAME — create a new cheato using $EDITOR
     add_parser = subparsers.add_parser("add", help="Add a new cheato")
@@ -183,20 +242,24 @@ def main():
     # cheatos edit NAME [--tags] — edit content or tags of a cheato
     edit_parser = subparsers.add_parser("edit", help="Edit a cheato")
     edit_parser.add_argument("name")
+    edit_parser.completer = cheato_name_completer
     edit_parser.add_argument("--tags", action="store_true", help="Edit tags of a cheato")
 
     # cheatos remove NAME — delete a cheato
     rm_parser = subparsers.add_parser("remove", help="Remove a cheato")
     rm_parser.add_argument("name")
+    rm_parser.completer = cheato_name_completer
 
-    # cheatos rename OLD_NAME NEW_NAME — rename a cheato
+    # cheatos rename OLD_NAME NEW_NAME
     rename_parser = subparsers.add_parser("rename", help="Rename a cheato")
-    rename_parser.add_argument("old_name")
+    old_arg = rename_parser.add_argument("old_name")
+    old_arg.completer = cheato_name_completer
     rename_parser.add_argument("new_name")
 
     # cheatos tags — list all unique tags
     tags_parser = subparsers.add_parser("tags", help="List all unique tags")
 
+    argcomplete.autocomplete(parser)
     args = parser.parse_args()
 
     if args.command == "list":

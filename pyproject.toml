@@ -5,7 +5,7 @@ description = "Cheatos: Your terminal post-it notes manager"
 authors = [
     {name = "Gorbiel", email = "tba@example.com"}
 ]
-dependencies = ["appdirs"]
+dependencies = ["appdirs", "argcomplete"]
 requires-python = ">=3.7"
 
 [project.scripts]
