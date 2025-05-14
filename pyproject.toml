@@ -1,0 +1,16 @@
+[project]
+name = "cheatos"
+version = "0.1.0"
+description = "Cheatos: Your terminal post-it notes"
+authors = [
+    {name = "Gorbiel", email = "you@example.com"}
+]
+dependencies = ["appdirs"]
+requires-python = ">=3.7"
+
+[project.scripts]
+cheatos = "cheatos.cli:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
