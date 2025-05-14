@@ -114,26 +114,42 @@ def show_cheato(name):
 def main():
     ensure_cheato_dir()
     parser = argparse.ArgumentParser(description="Cheatos: Your terminal post-it notes")
-    parser.add_argument("topic", nargs="?", help="Cheato to display")
-    parser.add_argument("--list", action="store_true", help="List all cheatos")
-    parser.add_argument("--add", metavar="TOPIC", help="Add a new cheato")
-    parser.add_argument("--remove", metavar="TOPIC", help="Remove a cheato")
-    parser.add_argument("--edit", metavar="TOPIC", help="Edit an existing cheato")
-    parser.add_argument("--edit-tags", metavar="TOPIC", help="Edit tags for a cheato")
-    parser.add_argument("--tag", metavar="TAG", help="Filter --list by tag")
+    subparsers = parser.add_subparsers(dest="command", required=True)
+
+    # cheatos list [--tag TAG] — list all cheatos or filter by tag
+    list_parser = subparsers.add_parser("list", help="List all cheatos")
+    list_parser.add_argument("--tag", help="Filter by tag")
+
+    # cheatos show NAME — display a single cheato
+    show_parser = subparsers.add_parser("show", help="Show a cheato")
+    show_parser.add_argument("name")
+
+    # cheatos add NAME — create a new cheato using $EDITOR
+    add_parser = subparsers.add_parser("add", help="Add a new cheato")
+    add_parser.add_argument("name")
+
+    # cheatos edit NAME [--tags] — edit content or tags of a cheato
+    edit_parser = subparsers.add_parser("edit", help="Edit a cheato")
+    edit_parser.add_argument("name")
+    edit_parser.add_argument("--tags", action="store_true", help="Edit tags of a cheato")
+
+    # cheatos remove NAME — delete a cheato
+    rm_parser = subparsers.add_parser("remove", help="Remove a cheato")
+    rm_parser.add_argument("name")
+
     args = parser.parse_args()
 
-    if args.list:
+    if args.command == "list":
         list_cheatos(args.tag)
-    elif args.add:
-        add_cheato(args.add)
-    elif args.remove:
-        remove_cheato(args.remove)
-    elif args.edit:
-        edit_cheato(args.edit)
-    elif args.edit_tags:
-        edit_tags(args.edit_tags)
-    elif args.topic:
-        show_cheato(args.topic)
-    else:
-        parser.print_help()
+    elif args.command == "show":
+        show_cheato(args.name)
+    elif args.command == "add":
+        add_cheato(args.name)
+    elif args.command == "edit":
+        if args.tags:
+            edit_tags(args.name)
+        else:
+            edit_cheato(args.name)
+    elif args.command == "remove":
+        remove_cheato(args.name)
+

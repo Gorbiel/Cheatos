@@ -1,9 +1,9 @@
 [project]
 name = "cheatos"
-version = "0.1.0"
-description = "Cheatos: Your terminal post-it notes"
+version = "0.2.0"
+description = "Cheatos: Your terminal post-it notes manager"
 authors = [
-    {name = "Gorbiel", email = "you@example.com"}
+    {name = "Gorbiel", email = "tba@example.com"}
 ]
 dependencies = ["appdirs"]
 requires-python = ">=3.7"
