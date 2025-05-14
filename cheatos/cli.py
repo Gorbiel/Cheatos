@@ -111,6 +111,20 @@ def list_cheatos(tag_filter=None):
         print(f"  {name}")
 
 
+def list_all_tags():
+    tags = set()
+    for path in CHEATO_DIR.glob("*.json"):
+        with open(path) as f:
+            data = json.load(f)
+            tags.update(data.get("tags", []))
+    if tags:
+        print("Available tags:")
+        for tag in sorted(tags):
+            print(f"  {tag}")
+    else:
+        print("No tags found.")
+
+
 def show_cheato(name):
     data = load_cheato(name)
     if not data:
@@ -120,6 +134,28 @@ def show_cheato(name):
     print(data["content"])
     if data.get("tags"):
         print(f"\nTags: {', '.join(data['tags'])}")
+
+
+def rename_cheato(old_name, new_name):
+    old_path = get_cheato_path(old_name)
+    new_path = get_cheato_path(new_name)
+
+    if not old_path.exists():
+        print(f"Cheato '{old_name}' does not exist.")
+        return
+    if new_path.exists():
+        print(f"A cheato named '{new_name}' already exists.")
+        return
+
+    with open(old_path, "r") as f:
+        data = json.load(f)
+    data["title"] = new_name
+
+    with open(new_path, "w") as f:
+        json.dump(data, f, indent=2)
+
+    old_path.unlink()
+    print(f"Renamed cheato '{old_name}' to '{new_name}'.")
 
 
 def main():
@@ -153,6 +189,14 @@ def main():
     rm_parser = subparsers.add_parser("remove", help="Remove a cheato")
     rm_parser.add_argument("name")
 
+    # cheatos rename OLD_NAME NEW_NAME — rename a cheato
+    rename_parser = subparsers.add_parser("rename", help="Rename a cheato")
+    rename_parser.add_argument("old_name")
+    rename_parser.add_argument("new_name")
+
+    # cheatos tags — list all unique tags
+    tags_parser = subparsers.add_parser("tags", help="List all unique tags")
+
     args = parser.parse_args()
 
     if args.command == "list":
@@ -168,3 +212,7 @@ def main():
             edit_cheato(args.name)
     elif args.command == "remove":
         remove_cheato(args.name)
+    elif args.command == "tags":
+        list_all_tags()
+    elif args.command == "rename":
+        rename_cheato(args.old_name, args.new_name)
