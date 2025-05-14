@@ -1,12 +1,27 @@
 [project]
 name = "cheatos"
-version = "0.2.0"
+version = "1.0.0"
 description = "Cheatos: Your terminal post-it notes manager"
 authors = [
     {name = "Gorbiel", email = "tba@example.com"}
 ]
-dependencies = ["appdirs", "argcomplete"]
+license = {text = "MIT"}
+readme = "README.md"
 requires-python = ">=3.7"
+dependencies = ["appdirs", "argcomplete"]
+keywords = ["cli", "notes", "cheatsheet", "terminal", "productivity"]
+
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.10",
+    "Operating System :: OS Independent",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "Topic :: Utilities"
+]
 
 [project.scripts]
 cheatos = "cheatos.cli:main"

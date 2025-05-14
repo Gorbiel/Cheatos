@@ -9,10 +9,29 @@ from pathlib import Path
 from appdirs import user_data_dir
 from datetime import datetime
 from bson import encode as bson_encode, decode_all as bson_decode_all
+import tomli
 
 APP_NAME = "cheatos"
 APP_AUTHOR = "gorbiel"
 CHEATO_DIR = Path(user_data_dir(APP_NAME, APP_AUTHOR))
+
+try:
+    from importlib.metadata import version as get_installed_version
+except ImportError:
+    from importlib_metadata import version as get_installed_version  # For Python <3.8 fallback
+
+
+def get_version():
+    try:
+        return get_installed_version("cheatos")
+    except Exception:
+        try:
+            pyproject_path = Path(__file__).parent.parent / "pyproject.toml"
+            with open(pyproject_path, "rb") as f:
+                data = tomli.load(f)
+            return data["project"]["version"]
+        except Exception:
+            return "unknown"
 
 
 def ensure_cheato_dir():
@@ -104,7 +123,6 @@ def open_editor(initial_content=""):
         tf.seek(0)
         content = tf.read()
     return content.strip()
-
 
 
 def add_cheato(name):
@@ -264,12 +282,23 @@ def main():
     check_first_time()
 
     parser = argparse.ArgumentParser(description="Cheatos: Your terminal post-it notes manager")
+
+    # Add version information
+    parser.add_argument(
+        "--version",
+        action="version",
+        version=f"cheatos v{get_version()}"
+    )
+
     subparsers = parser.add_subparsers(
         dest="command",
         required=True,
         metavar="<command>",
         title="Available commands"
     )
+
+    # cheatos help — show this help message
+    help_parser = subparsers.add_parser("help", help="Show help")
 
     # cheatos list [--tag TAG] — list all cheatos or filter by tag
     list_parser = subparsers.add_parser("list", help="List all cheatos")
@@ -338,6 +367,9 @@ def main():
         export_cheatos(args.file_path)
     elif args.command == "import":
         import_cheatos(args.file_path, force=args.force)
+    elif args.command == "help":
+        parser.print_help()
+
 
 if __name__ == "__main__":
     main()
