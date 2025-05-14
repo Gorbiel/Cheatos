@@ -8,6 +8,7 @@ import subprocess
 from pathlib import Path
 from appdirs import user_data_dir
 from datetime import datetime
+from bson import encode as bson_encode, decode_all as bson_decode_all
 
 APP_NAME = "cheatos"
 APP_AUTHOR = "gorbiel"
@@ -88,7 +89,7 @@ def save_cheato(name, content, tags):
         "title": name,
         "content": content.strip(),
         "tags": tags,
-        "modified": datetime.now().isoformat() + "Z"
+        "modified": datetime.utcnow().isoformat() + "Z"
     }
     with open(path, "w") as f:
         json.dump(data, f, indent=2)
@@ -96,14 +97,14 @@ def save_cheato(name, content, tags):
 
 def open_editor(initial_content=""):
     editor = os.environ.get("EDITOR", "nano")
-    with tempfile.NamedTemporaryFile(suffix=".tmp", delete=False, mode="w+") as tf:
+    with tempfile.NamedTemporaryFile(suffix=".tmp", delete=True, mode="w+") as tf:
         tf.write(initial_content)
         tf.flush()
         os.system(f"{editor} {tf.name}")
         tf.seek(0)
         content = tf.read()
-    os.unlink(tf.name)
     return content.strip()
+
 
 
 def add_cheato(name):
@@ -213,6 +214,51 @@ def rename_cheato(old_name, new_name):
     print(f"Renamed cheato '{old_name}' to '{new_name}'.")
 
 
+def export_cheatos(file_path):
+    export_path = Path(file_path)
+    cheatos = []
+    for path in CHEATO_DIR.glob("*.json"):
+        with open(path) as f:
+            cheatos.append(json.load(f))
+
+    if export_path.suffix == ".bson":
+        with open(export_path, "wb") as f:
+            f.write(bson_encode({"cheatos": cheatos}))
+        print(f"✅ Exported {len(cheatos)} cheatos to {export_path} (BSON)")
+    else:
+        with open(export_path, "w") as f:
+            json.dump(cheatos, f, indent=2)
+        print(f"✅ Exported {len(cheatos)} cheatos to {export_path} (JSON)")
+
+
+def import_cheatos(file_path, force=False):
+    import_path = Path(file_path)
+    if not import_path.exists():
+        print(f"❌ File not found: {import_path}")
+        return
+
+    if import_path.suffix == ".bson":
+        with open(import_path, "rb") as f:
+            data = bson_decode_all(f.read())
+        cheatos = data[0].get("cheatos", [])
+    else:
+        with open(import_path, "r") as f:
+            cheatos = json.load(f)
+
+    count = 0
+    for cheato in cheatos:
+        title = cheato["title"]
+        path = get_cheato_path(title)
+        if path.exists() and not force:
+            print(f"⚠️ Skipping existing cheato '{title}'")
+            continue
+        with open(path, "w") as f:
+            json.dump(cheato, f, indent=2)
+        count += 1
+
+    print(f"✅ Imported {count} cheatos.")
+
+
 def main():
     ensure_cheato_dir()
     check_first_time()
@@ -241,14 +287,14 @@ def main():
 
     # cheatos edit NAME [--tags] — edit content or tags of a cheato
     edit_parser = subparsers.add_parser("edit", help="Edit a cheato")
-    edit_parser.add_argument("name")
-    edit_parser.completer = cheato_name_completer
+    edit_name_arg = edit_parser.add_argument("name")
+    edit_name_arg.completer = cheato_name_completer
     edit_parser.add_argument("--tags", action="store_true", help="Edit tags of a cheato")
 
     # cheatos remove NAME — delete a cheato
     rm_parser = subparsers.add_parser("remove", help="Remove a cheato")
-    rm_parser.add_argument("name")
-    rm_parser.completer = cheato_name_completer
+    rm_name_arg = rm_parser.add_argument("name")
+    rm_name_arg.completer = cheato_name_completer
 
     # cheatos rename OLD_NAME NEW_NAME
     rename_parser = subparsers.add_parser("rename", help="Rename a cheato")
@@ -258,6 +304,15 @@ def main():
 
     # cheatos tags — list all unique tags
     tags_parser = subparsers.add_parser("tags", help="List all unique tags")
+
+    # cheatos export FILE_PATH — export all cheatos to a file
+    export_parser = subparsers.add_parser("export", help="Export all cheatos")
+    export_parser.add_argument("file_path", help="Output file path (.json or .bson)")
+
+    # cheatos import FILE_PATH [--force] — import cheatos from a file
+    import_parser = subparsers.add_parser("import", help="Import cheatos from file")
+    import_parser.add_argument("file_path", help="Path to import file (.json or .bson)")
+    import_parser.add_argument("--force", action="store_true", help="Overwrite existing cheatos")
 
     argcomplete.autocomplete(parser)
     args = parser.parse_args()
@@ -279,3 +334,10 @@ def main():
         list_all_tags()
     elif args.command == "rename":
         rename_cheato(args.old_name, args.new_name)
+    elif args.command == "export":
+        export_cheatos(args.file_path)
+    elif args.command == "import":
+        import_cheatos(args.file_path, force=args.force)
+
+if __name__ == "__main__":
+    main()
