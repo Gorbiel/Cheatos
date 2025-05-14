@@ -2,8 +2,8 @@ from pathlib import Path
 import os
 import json
 import tempfile
-from datetime import datetime
 import tomli
+from datetime import datetime, UTC
 from appdirs import user_data_dir
 
 try:
@@ -70,7 +70,7 @@ def save_cheato(name, content, tags):
         "title": name,
         "content": content.strip(),
         "tags": tags,
-        "modified": datetime.utcnow().isoformat() + "Z"
+        "modified": datetime.now(UTC).isoformat()
     }
     with open(path, "w") as f:
         json.dump(data, f, indent=2)
@@ -80,6 +80,7 @@ def open_editor(initial_content=""):
     """
     Open the user's default editor to input or edit text.
 
+    If the first line remains unchanged after editing, it is excluded from the result.
     Returns the resulting content as a stripped string.
     """
     editor = os.environ.get("EDITOR", "nano")
@@ -88,5 +89,9 @@ def open_editor(initial_content=""):
         tf.flush()
         os.system(f"{editor} {tf.name}")
         tf.seek(0)
-        content = tf.read()
-    return content.strip()
+        lines = tf.readlines()
+
+    if lines and lines[0].strip() == initial_content.strip():
+        lines = lines[1:]
+
+    return "".join(lines).strip()
