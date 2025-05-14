@@ -25,7 +25,7 @@ def check_first_time():
 
     print("\U0001F44B Welcome to Cheatos!")
     print("To enable shell auto-completion, you can set it up now.")
-    choice = input("Would you like to enable it? [y/N]: ").strip().lower()
+    choice = input("Would you like to enable it? [y/n]: ").strip().lower()
 
     if choice == "y":
         shell = os.environ.get("SHELL", "")

@@ -3,6 +3,7 @@ import os
 import json
 import tempfile
 from datetime import datetime
+import tomli
 from appdirs import user_data_dir
 
 try:
@@ -15,8 +16,6 @@ APP_AUTHOR = "gorbiel"
 CHEATO_DIR = Path(user_data_dir(APP_NAME, APP_AUTHOR))
 
 
-
-
 def get_version():
     """
     Import cheatos from a JSON or BSON file.
@@ -27,7 +26,6 @@ def get_version():
         return get_installed_version("cheatos")
     except Exception:
         try:
-            import tomli
             pyproject_path = Path(__file__).parent.parent / "pyproject.toml"
             with open(pyproject_path, "rb") as f:
                 data = tomli.load(f)
