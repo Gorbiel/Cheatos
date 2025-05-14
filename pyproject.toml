@@ -8,7 +8,12 @@ authors = [
 license = {text = "MIT"}
 readme = "README.md"
 requires-python = ">=3.7"
-dependencies = ["appdirs", "argcomplete"]
+dependencies = [
+  "appdirs",
+  "argcomplete",
+  "tomli",
+  "pymongo"
+]
 keywords = ["cli", "notes", "cheatsheet", "terminal", "productivity"]
 
 classifiers = [
