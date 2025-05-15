@@ -1,6 +1,6 @@
 [project]
 name = "cheatos"
-version = "1.0.0"
+version = "1.0.1"
 description = "Cheatos: Your terminal post-it notes manager"
 authors = [
     {name = "Gorbiel", email = "tba@example.com"}
@@ -27,6 +27,13 @@ classifiers = [
     "Intended Audience :: Developers",
     "Topic :: Utilities"
 ]
+
+[project.urls]
+Homepage = "https://github.com/Gorbiel/Cheatos?tab=readme-ov-file#cheatos"
+Documentation = "https://github.com/Gorbiel/Cheatos/wiki"
+Issues = "https://github.com/Gorbiel/Cheatos/issues"
+Source = "https://github.com/Gorbiel/Cheatos"
+
 
 [project.scripts]
 cheatos = "cheatos.cli:main"
