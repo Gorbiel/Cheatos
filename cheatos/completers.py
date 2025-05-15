@@ -1,10 +1,5 @@
 import json
-from pathlib import Path
-from appdirs import user_data_dir
-
-APP_NAME = "cheatos"
-APP_AUTHOR = "gorbiel"
-CHEATO_DIR = Path(user_data_dir(APP_NAME, APP_AUTHOR))
+from cheatos.utils import CHEATO_DIR
 
 
 def cheato_name_completer(**kwargs):

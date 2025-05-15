@@ -1,13 +1,9 @@
 import json
 from pathlib import Path
-from appdirs import user_data_dir
 from bson import encode as bson_encode, decode_all as bson_decode_all
+from .utils import get_cheato_path, CHEATO_DIR
 
-from .utils import get_cheato_path
 
-APP_NAME = "cheatos"
-APP_AUTHOR = "gorbiel"
-CHEATO_DIR = Path(user_data_dir(APP_NAME, APP_AUTHOR))
 
 
 def check_first_time():

@@ -1,7 +1,5 @@
-from .utils import get_cheato_path, load_cheato, save_cheato, open_editor
-from pathlib import Path
+from .utils import get_cheato_path, load_cheato, save_cheato, open_editor, CHEATO_DIR
 import json
-from appdirs import user_data_dir
 
 
 def add_cheato(name):
@@ -75,7 +73,6 @@ def list_cheatos(tag_filter=None):
 
     Displays the names of matching cheatos in sorted order.
     """
-    CHEATO_DIR = Path(user_data_dir("cheatos", "gorbiel"))
     cheatos = []
     for path in CHEATO_DIR.glob("*.json"):
         with open(path) as f:
@@ -95,7 +92,6 @@ def list_all_tags():
     """
     Print all unique tags used across all cheatos.
     """
-    CHEATO_DIR = Path(user_data_dir("cheatos", "gorbiel"))
     tags = set()
     for path in CHEATO_DIR.glob("*.json"):
         with open(path) as f:
