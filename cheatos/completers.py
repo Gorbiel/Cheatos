@@ -1,4 +1,5 @@
 import json
+
 from cheatos.utils import CHEATO_DIR
 
 

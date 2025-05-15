@@ -4,8 +4,6 @@ from bson import encode as bson_encode, decode_all as bson_decode_all
 from .utils import get_cheato_path, CHEATO_DIR
 
 
-
-
 def check_first_time():
     """
     Display a welcome message and optionally set up shell autocompletion.

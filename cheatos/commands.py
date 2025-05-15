@@ -12,9 +12,9 @@ def add_cheato(name):
     if get_cheato_path(name).exists():
         print(f"Cheato '{name}' already exists.")
         return
-    print(f"Creating new cheato '{name}' using your editor...")
-    content = open_editor("# Write your cheato content here")
-    tags_input = input("Tags (comma separated): ")
+    print(f"Creating new cheato '{name}'...")
+    content = open_editor("# Write your cheato content below")
+    tags_input = input("Tags (comma separated, leave empty for default): ")
     tags = [tag.strip() for tag in tags_input.split(",") if tag.strip()] or ["default"]
     save_cheato(name, content, tags)
     print(f"Cheato '{name}' added.")
