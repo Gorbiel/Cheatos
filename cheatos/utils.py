@@ -70,7 +70,7 @@ def save_cheato(name, content, tags):
         "title": name,
         "content": content.strip(),
         "tags": tags,
-        "modified": datetime.now(UTC).isoformat()
+        "modified": datetime.now(UTC).astimezone().isoformat()
     }
     with open(path, "w") as f:
         json.dump(data, f, indent=2)
@@ -83,7 +83,11 @@ def open_editor(initial_content=""):
     If the first line remains unchanged after editing, it is excluded from the result.
     Returns the resulting content as a stripped string.
     """
-    editor = os.environ.get("EDITOR", "nano")
+    editor = (
+            os.environ.get("EDITOR")
+            or ("notepad" if os.name == "nt" else None)
+            or "nano"
+    )
     with tempfile.NamedTemporaryFile(suffix=".tmp", delete=True, mode="w+") as tf:
         tf.write(initial_content)
         tf.flush()
