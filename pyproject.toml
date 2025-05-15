@@ -1,6 +1,6 @@
 [project]
 name = "cheatos"
-version = "1.0.1"
+version = "1.0.2"
 description = "Cheatos: Your terminal post-it notes manager"
 authors = [
     {name = "Gorbiel", email = "tba@example.com"}

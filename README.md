@@ -131,4 +131,4 @@ Add this to your `.bashrc` or `.zshrc`.
 
 ## 📄 License
 
-MIT © Gorbiel 2025
+MIT © 2025 Gorbiel
