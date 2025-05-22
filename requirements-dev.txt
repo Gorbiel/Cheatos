@@ -1,0 +1,7 @@
+# Runtime dependencies
+-r requirements.txt
+
+# Dev/test dependencies
+pytest>=7.0.0
+pylint>=3.0.0
+twine>=5.0.0
